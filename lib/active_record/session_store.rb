@@ -1,3 +1,4 @@
+require 'active_record'
 require 'active_record/session_store/version'
 require 'action_dispatch/session/active_record_store'
 require "active_record/session_store/extension/logger_silencer"
@@ -108,11 +109,14 @@ module ActiveRecord
   end
 end
 
-require 'active_record/session_store/session'
+ActiveSupport.on_load(:active_record) do
+  require 'active_record/session_store/session'
+  ActionDispatch::Session::ActiveRecordStore.session_class = ActiveRecord::SessionStore::Session
+end
+
 require 'active_record/session_store/sql_bypass'
 require 'active_record/session_store/railtie' if defined?(Rails)
 
-ActionDispatch::Session::ActiveRecordStore.session_class = ActiveRecord::SessionStore::Session
 Logger.send :include, ActiveRecord::SessionStore::Extension::LoggerSilencer
 
 begin
