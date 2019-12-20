@@ -14,11 +14,19 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
     end
 
     def get_session_value
-      render :plain => "foo: #{session[:foo].inspect}"
+      if ActiveRecord::VERSION::MAJOR == 4
+        render :text => "foo: #{session[:foo].inspect}"
+      else
+        render :plain => "foo: #{session[:foo].inspect}"
+      end
     end
 
     def get_session_id
-      render :plain => "#{request.session.id}"
+      if ActiveRecord::VERSION::MAJOR == 4
+        render :text => "#{request.session.id}"
+      else
+        render :plain => "#{request.session.id}"
+      end
     end
 
     def call_reset_session
@@ -52,7 +60,11 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal 'foo: "bar"', response.body
 
-          get '/set_session_value', :params => { :foo => "baz" }
+          if ActiveRecord::VERSION::MAJOR == 4
+            get '/set_session_value', :foo => "baz"
+          else
+            get '/set_session_value', :params => { :foo => "baz" }
+          end
           assert_response :success
           assert cookies['_session_id']
 
@@ -92,7 +104,11 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
 
   def test_calling_reset_session_twice_does_not_raise_errors
     with_test_route_set do
-      get '/call_reset_session', :params => { :twice => "true" }
+      if ActiveRecord::VERSION::MAJOR == 4
+        get '/call_reset_session', :twice => "true"
+      else
+        get '/call_reset_session', :params => { :twice => "true" }
+      end
       assert_response :success
 
       get '/get_session_value'
@@ -189,7 +205,11 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
 
       reset!
 
-      get '/get_session_value', :params => { :_session_id => session_id }
+      if ActiveRecord::VERSION::MAJOR == 4
+        get '/get_session_value', :_session_id => session_id
+      else
+        get '/get_session_value', :params => { :_session_id => session_id }
+      end
       assert_response :success
       assert_equal 'foo: nil', response.body
       assert_not_equal session_id, cookies['_session_id']
@@ -210,7 +230,11 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
 
       reset!
 
-      get '/set_session_value', :params => { :_session_id => session_id, :foo => "baz" }
+      if ActiveRecord::VERSION::MAJOR == 4
+        get '/set_session_value', :_session_id => session_id, :foo => "baz"
+      else
+        get '/set_session_value', :params => { :_session_id => session_id, :foo => "baz" }
+      end
       assert_response :success
       assert_equal session_id, cookies['_session_id']
 
@@ -240,7 +264,11 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
   def test_incoming_invalid_session_id_via_parameter_should_be_ignored
     with_test_route_set(:cookie_only => false) do
       open_session do |sess|
-        sess.get '/set_session_value', :params => { :_session_id => 'INVALID' }
+        if ActiveRecord::VERSION::MAJOR == 4
+          sess.get '/set_session_value', :_session_id => 'INVALID'
+        else
+          sess.get '/set_session_value', :params => { :_session_id => 'INVALID' }
+        end
         new_session_id = sess.cookies['_session_id']
         assert_not_equal 'INVALID', new_session_id
 
@@ -280,7 +308,11 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
     define_method :"test_unsecured_sessions_are_retrieved_and_migrated_for_#{class_name}" do
       with_store(class_name) do
         with_test_route_set do
-          get '/set_session_value', params: { foo: 'baz' }
+          if ActiveRecord::VERSION::MAJOR == 4
+            get '/set_session_value', foo: 'baz'
+          else
+            get '/set_session_value', params: { foo: 'baz' }
+          end
           assert_response :success
           public_session_id = cookies['_session_id']
 
@@ -303,7 +335,7 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
     define_method :"test_sessions_cannot_be_retrieved_by_their_private_session_id_for_#{class_name}" do
       with_store(class_name) do
         with_test_route_set do
-          get '/set_session_value', params: { foo: 'baz' }
+          get '/set_session_value'
           assert_response :success
 
           session = ActiveRecord::SessionStore::Session.last
