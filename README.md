@@ -5,6 +5,20 @@ A session store backed by an Active Record class. A default class is
 provided, but any object duck-typing to an Active Record Session class
 with text `session_id` and `data` attributes is sufficient.
 
+
+LTS version
+----------
+
+This is a fork of Rails' official [Active Record Session Store](https://github.com/rails/activerecord-session_store) implementation,
+that remains compatible with Rails 4.2 (LTS), as well as current Rails versions.
+
+To use it, you need to add it to the Gemfile like this:
+
+```
+gem 'activerecord-session_store', git: 'https://github.com/rails-lts/activerecord-session_store.git', branch: 'lts'
+```
+
+
 Installation
 ------------
 
