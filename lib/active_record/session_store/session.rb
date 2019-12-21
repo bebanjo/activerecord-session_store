@@ -79,10 +79,10 @@ module ActiveRecord
         end
         raw_session_id = read_attribute(session_id_column)
         if ActionDispatch::Session::ActiveRecordStore.private_session_id?(raw_session_id)
-          # is already private, nothing to do
+          # is already secure, nothing to do
         else
-          session_id_object = Rack::Session::SessionId.new(raw_session_id)
-          update_column(session_id_column, session_id_object.private_id)
+          private_session_id = ActionDispatch::Session::ActiveRecordStore.hash_session_id(raw_session_id)
+          update_column(session_id_column, private_session_id)
         end
       end
 

@@ -52,13 +52,23 @@ module ActionDispatch
     #
     # The example SqlBypass class is a generic SQL session store. You may
     # use it as a basis for high-performance database-specific stores.
-    class ActiveRecordStore < ActionDispatch::Session::AbstractSecureStore
+    class ActiveRecordStore < ActionDispatch::Session::AbstractStore
       # The class used for session storage. Defaults to
       # ActiveRecord::SessionStore::Session
       cattr_accessor :session_class
 
       SESSION_RECORD_KEY = 'rack.session.record'
       ENV_SESSION_OPTIONS_KEY = Rack::RACK_SESSION_OPTIONS
+
+      def self.private_session_id?(session_id)
+        # user tried to retrieve a session by a private key?
+        session_id =~ /\A\d+::/
+      end
+
+      def self.hash_session_id(public_session_id)
+        # mimick the hashing in Rack::Session::SessionId
+        "2::#{Digest::SHA256.hexdigest(public_session_id)}"
+      end
 
     private
       def get_session(request, sid)
@@ -67,7 +77,7 @@ module ActionDispatch
             # If the sid was nil or if there is no pre-existing session under the sid,
             # force the generation of a new sid and associate a new session associated with the new sid
             sid = generate_sid
-            session = @@session_class.new(:session_id => sid.private_id, :data => {})
+            session = build_session(sid, :data => {})
           end
           request.env[SESSION_RECORD_KEY] = session
           [sid, session.data]
@@ -106,7 +116,7 @@ module ActionDispatch
             new_sid = generate_sid
 
             if options[:renew]
-              new_model = @@session_class.new(:session_id => new_sid.private_id, :data => data)
+              new_model = build_session(new_sid, :data => data)
               new_model.save
               request.env[SESSION_RECORD_KEY] = new_model
             end
@@ -121,7 +131,7 @@ module ActionDispatch
           unless model
             id = generate_sid
 
-            model = @@session_class.new(:session_id => id.private_id, :data => {})
+            model = build_session(id, :data => {})
             model.save unless request.session_options[:skip]
           end
           if request.env[ENV_SESSION_OPTIONS_KEY][:id].nil?
@@ -134,9 +144,10 @@ module ActionDispatch
       end
 
       def get_session_with_fallback(sid)
-        if sid && !self.class.private_session_id?(sid.public_id)
-          if (session = @@session_class.find_by_session_id(sid.private_id) || @@session_class.find_by_session_id(sid.public_id))
-            session.session_id = sid.private_id
+        if sid && !self.class.private_session_id?(sid)
+          private_sid = self.class.hash_session_id(sid)
+          if (session = @@session_class.find_by_session_id(private_sid) || @@session_class.find_by_session_id(sid))
+            session.session_id = private_sid
             session
           end
         end
@@ -147,15 +158,14 @@ module ActionDispatch
         [id, model.data]
       end
 
+      def build_session(sid, options)
+        private_sid = sid && self.class.hash_session_id(sid)
+        @@session_class.new(options.merge(:session_id => private_sid))
+      end
+
       def logger
         ActiveRecord::Base.logger || ActiveRecord::SessionStore::NilLogger
       end
-
-      def self.private_session_id?(session_id)
-        # user tried to retrieve a session by a private key?
-        session_id =~ /\A\d+::/
-      end
-
     end
   end
 end
