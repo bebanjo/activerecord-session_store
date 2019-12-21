@@ -18,7 +18,7 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
     end
 
     def get_session_id
-      render :plain => "#{request.session['session_id']}"
+      render :plain => "#{request.session.id}"
     end
 
     def call_reset_session
@@ -270,7 +270,7 @@ class ActionControllerTest < ActionDispatch::IntegrationTest
           assert session
           assert_not_equal public_session_id, session.session_id
 
-          expected_private_id = Rack::Session::SessionId.new(public_session_id).private_id
+          expected_private_id = "2::#{Digest::SHA256.hexdigest(public_session_id)}"
 
           assert_equal expected_private_id, session.session_id
         end

@@ -134,7 +134,7 @@ module ActiveRecord
 
         session.secure!
 
-        secured = Rack::Session::SessionId.new(session_id).private_id
+        secured = ActionDispatch::Session::ActiveRecordStore.hash_session_id(session_id)
         assert_equal secured, session.reload.read_attribute(:session_id)
       end
 
@@ -158,7 +158,7 @@ module ActiveRecord
 
         session.secure!
 
-        secured = Rack::Session::SessionId.new(session_id).private_id
+        secured = ActionDispatch::Session::ActiveRecordStore.hash_session_id(session_id)
         assert_equal secured, session.reload.read_attribute(:sessid)
       ensure
         klass.drop_table!
