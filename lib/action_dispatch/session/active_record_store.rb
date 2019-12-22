@@ -150,9 +150,11 @@ module ActionDispatch
       def get_session_with_fallback(sid)
         if sid && !self.class.private_session_id?(sid)
           private_sid = self.class.hash_session_id(sid)
-          if (session = @@session_class.find_by_session_id(private_sid) || @@session_class.find_by_session_id(sid))
-            session.session_id = private_sid
-            session
+          if (secure_session = @@session_class.find_by_session_id(private_sid))
+            secure_session
+          elsif (insecure_session = @@session_class.find_by_session_id(sid))
+            insecure_session.session_id = private_sid
+            insecure_session
           end
         end
       end
