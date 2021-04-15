@@ -1,3 +1,7 @@
+🚨🚨🚨 This `skip-session` branch has been deprecated and shouldn't be used anymore 🚨🚨🚨
+
+Please, use [`skip-session-lts`](https://github.com/bebanjo/activerecord-session_store/tree/skip-session-lts) or [`skip-session-stable`](https://github.com/bebanjo/activerecord-session_store/tree/skip-session-stable) instead.
+
 Active Record Session Store
 ===========================
 
