@@ -6,18 +6,16 @@ provided, but any object duck-typing to an Active Record Session class
 with text `session_id` and `data` attributes is sufficient.
 
 
-LTS version
-----------
+`skip-session-lts` branch
+-------------------------
 
-This is a fork of Rails' official [Active Record Session Store](https://github.com/rails/activerecord-session_store) implementation,
-that remains compatible with Rails 4.2 (LTS), as well as current Rails versions.
+`master` branch does not support Rails < 5.2. `skip-session-lts` will maintain that compatibility while keeping the `skip-session` functionality "alive". We must update this branch with security updates.
 
-To use it, you need to add it to the Gemfile like this:
+In order to keep this branch updated, you can base the updates on the `lts` branch of (ActiveRecord SessionStore LTS repo)[https://github.com/rails-lts/activerecord-session_store]
 
-```
-gem 'activerecord-session_store', git: 'https://github.com/rails-lts/activerecord-session_store.git', branch: 'lts'
-```
+You can add (ActiveRecord SessionStore LTS repo)[https://github.com/rails-lts/activerecord-session_store] as a `remote` to this repository and then cherry-pick the patches.
 
+We are also maintaining a `skip-session-stable` branch. That branch will follow `master` but keep the `skip-session` functionality "alive".
 
 Installation
 ------------
