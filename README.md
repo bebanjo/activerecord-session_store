@@ -38,7 +38,7 @@ been updated in the last 30 days. The 30 days cutoff can be changed using the
 Configuration
 --------------
 
-The default assumes a `sessions` tables with columns:
+The default assumes a `sessions` table with columns:
 
 *  `id` (numeric primary key),
 *  `session_id` (string, usually varchar; maximum length is 255), and
@@ -79,7 +79,7 @@ for free if you add `created_at` and `updated_at` datetime columns to
 the `sessions` table, making periodic session expiration a snap.
 
 You may provide your own session class implementation, whether a
-feature-packed Active Record or a bare-metal high-performance SQL
+feature-packed Active Record, or a bare-metal high-performance SQL
 store, by setting
 
 ```ruby
