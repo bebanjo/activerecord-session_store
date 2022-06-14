@@ -11,9 +11,9 @@ with text `session_id` and `data` attributes is sufficient.
 
 `master` branch does not support Rails < 5.2. `skip-session-lts` will maintain that compatibility while keeping the `skip-session` functionality "alive". We must update this branch with security updates.
 
-In order to keep this branch updated, you can base the updates on the `lts` branch of (ActiveRecord SessionStore LTS repo)[https://github.com/rails-lts/activerecord-session_store]
+In order to keep this branch updated, you can base the updates on the `lts` branch of [ActiveRecord SessionStore LTS repo](https://github.com/rails-lts/activerecord-session_store).
 
-You can add (ActiveRecord SessionStore LTS repo)[https://github.com/rails-lts/activerecord-session_store] as a `remote` to this repository and then cherry-pick the patches.
+You can add [ActiveRecord SessionStore LTS repo](https://github.com/rails-lts/activerecord-session_store) as a `remote` to this repository and then cherry-pick the patches.
 
 We are also maintaining a `skip-session-stable` branch. That branch will follow `master` but keep the `skip-session` functionality "alive".
 
