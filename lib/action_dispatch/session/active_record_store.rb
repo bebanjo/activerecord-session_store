@@ -134,7 +134,6 @@ module ActionDispatch
           model = get_session_with_fallback(id)
           unless model
             id = generate_sid
-
             model = build_session(id, :data => {})
             model.save unless request.session_options[:skip]
           end
